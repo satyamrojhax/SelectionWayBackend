@@ -90,15 +90,12 @@ Returns faculty information
 
 ## Deployment
 
-The application is deployed on Vercel at:
-- **Official URL**: https://selectionwaybackend.vercel.app/
-- **Development URL**: https://selectionwaybackend-31y4nas47-epowerxlabsproduct.vercel.app
+The application is deployed and ready for production use.
 
 ## Dependencies
 
 - **express**: Web framework for Node.js
 - **axios**: HTTP client for making requests to external APIs
-- **cors**: Cross-origin resource sharing middleware
 - **dotenv**: Environment variable management
 
 ## External APIs
@@ -113,6 +110,5 @@ The application integrates with:
 - ✅ Topic-based class and PDF organization
 - ✅ Duration formatting (HH:MM:SS)
 - ✅ Error handling and validation
-- ✅ CORS enabled for cross-origin requests
 - ✅ Environment-based configuration
-- ✅ Production deployment on Vercel
+- ✅ Production deployment ready
