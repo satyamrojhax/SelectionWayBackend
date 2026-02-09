@@ -9,36 +9,6 @@ router.get('/', async (req, res) => {
   try {
     const { status, id, type, topic } = req.query;
 
-    if (id && status === 'true') {
-      // Handle batch details
-      const response = await axios.post(
-        `${GDGOENKA_BASE_URL}/api/courses/by-id-2`,
-        { userId: '4151286', id }
-      );
-
-      const batchDetail = response.data.data;
-      
-      const filteredBatch = {
-        id: batchDetail.id,
-        title: batchDetail.title,
-        banner: batchDetail.banner,
-        bannerSquare: batchDetail.bannerSquare,
-        description: batchDetail.description,
-        liveClassesCount: batchDetail.liveClassesCount,
-        courseHighlights: batchDetail.courseHighlights,
-        validity: batchDetail.validity,
-        createdAt: batchDetail.createdAt,
-        updatedAt: batchDetail.updatedAt,
-        facultyDetails: batchDetail.facultyDetails,
-        demoVideos: batchDetail.demoVideos,
-        introVideo: batchDetail.introVideo,
-        faqs: batchDetail.faqs,
-        faq: batchDetail.faq
-      };
-
-      return res.json(filteredBatch);
-    }
-
     if (type === 'all') {
       const response = await axios.get(
         `${GDGOENKA_BASE_URL}/api/courses/active?userId=4151286`
@@ -180,6 +150,19 @@ router.get('/', async (req, res) => {
       const response = await axios.get(
         `${GDGOENKA_BASE_URL}/api/courses/${id}/classes?populate=full`
       );
+      
+      // Check if classes data exists
+      if (!response.data.data || !response.data.data.classes || response.data.data.classes.length === 0) {
+        return res.json({
+          state: 200,
+          msg: 'No classes available for this batch',
+          data: {
+            course: response.data.data.course || null,
+            classes: []
+          }
+        });
+      }
+      
       return res.json(response.data);
     }
 
@@ -187,6 +170,15 @@ router.get('/', async (req, res) => {
       const response = await axios.get(
         `${GDGOENKA_BASE_URL}/api/courses/${id}/classes?populate=full`
       );
+      
+      // Check if classes data exists
+      if (!response.data.data || !response.data.data.classes || response.data.data.classes.length === 0) {
+        return res.json({
+          state: 200,
+          msg: 'No topics available for this batch',
+          data: []
+        });
+      }
       
       const topics = response.data.data.classes.map(topic => ({
         id: topic.topicId,
@@ -201,29 +193,50 @@ router.get('/', async (req, res) => {
       const response = await axios.get(
         `${GDGOENKA_BASE_URL}/api/courses/${id}/pdfs?groupBy=topic`
       );
+      
+      // Check if PDFs data exists
+      if (!response.data.data || response.data.data.length === 0) {
+        return res.json({
+          state: 200,
+          msg: 'No PDFs available for this batch',
+          data: []
+        });
+      }
+      
       return res.json(response.data);
     }
 
-    res.status(400).json({ error: 'Invalid parameters' });
-  } catch (error) {
-    console.error('Error fetching batches:', error.message);
-    res.status(500).json({ error: 'Failed to fetch batches' });
-  }
-});
+    if (id && status === 'true' && !type) {
+      // Handle batch details (only when no type is specified)
+      const response = await axios.post(
+        `${GDGOENKA_BASE_URL}/api/courses/by-id-2`,
+        { userId: '4151286', id }
+      );
 
-router.get('/batch', async (req, res) => {
-  try {
-    const { id, status } = req.query;
+      const batchDetail = response.data.data;
+      
+      const filteredBatch = {
+        id: batchDetail.id,
+        title: batchDetail.title,
+        banner: batchDetail.banner,
+        bannerSquare: batchDetail.bannerSquare,
+        description: batchDetail.description,
+        liveClassesCount: batchDetail.liveClassesCount,
+        courseHighlights: batchDetail.courseHighlights,
+        validity: batchDetail.validity,
+        createdAt: batchDetail.createdAt,
+        updatedAt: batchDetail.updatedAt,
+        facultyDetails: batchDetail.facultyDetails,
+        demoVideos: batchDetail.demoVideos,
+        introVideo: batchDetail.introVideo,
+        faqs: batchDetail.faqs,
+        faq: batchDetail.faq
+      };
 
-    if (!id) {
-      return res.status(400).json({ error: 'id parameter is required' });
+      return res.json(filteredBatch);
     }
 
-    const response = await axios.get(
-      `${SELECTIONWAY_BASE_URL}/_next/data/4nTxWdItRV9RICli72Xx8/en-US/batches/ssc-mains-batch/${id}.json?slug=ssc-mains-batch&id=${id}`
-    );
-
-    return res.json(response.data);
+    res.status(400).json({ error: 'Invalid parameters' });
   } catch (error) {
     console.error('Error fetching batch details:', error.message);
     res.status(500).json({ error: 'Failed to fetch batch details' });
