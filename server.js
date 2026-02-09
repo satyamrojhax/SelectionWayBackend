@@ -1,8 +1,16 @@
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Enable CORS for all origins
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 
@@ -405,10 +413,10 @@ app.get('/api/docs', (req, res) => {
       }
     ],
     usage: {
-      baseUrl: "https://your-domain.com/api",
+      baseUrl: "https://selectionwaybackend.vercel.app/api",
       authentication: "No authentication required",
       rateLimit: "No rate limiting implemented",
-      cors: "CORS not implemented (handled by hosting platform)",
+      cors: "CORS enabled for all origins",
       format: "JSON",
       encoding: "UTF-8"
     },
